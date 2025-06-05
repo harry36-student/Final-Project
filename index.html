@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>股票推薦GPT (LM Studio)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #chat {
+      max-height: 400px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      color: blue;
+    }
+    .bot {
+      color: green;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h2>本地互動 (via LM Studio)</h2>
+  <div id="chat"></div>
+  <input type="text" id="userInput" placeholder="輸入訊息..." size="50" />
+  <button onclick="sendMessage()">送出</button>
+
+  <script>
+    let history = [];
+
+    async function sendMessage() {
+      const inputBox = document.getElementById("userInput");
+      const userMessage = inputBox.value;
+      if (!userMessage.trim()) return;
+
+      // 加入使用者訊息到歷史紀錄
+      history.push({ role: "user", content: userMessage });
+
+      const chatDiv = document.getElementById("chat");
+
+      // 顯示使用者訊息
+      const userDiv = document.createElement("div");
+      userDiv.className = "message user";
+      userDiv.textContent = `你：${userMessage}`;
+      chatDiv.appendChild(userDiv);
+
+      inputBox.value = "";
+
+      // 傳送請求到 FastAPI 後端
+      const response = await fetch("http://localhost:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "local-model",
+          messages: history
+        }),
+      });
+
+      const data = await response.json();
+      let reply = data.choices[0].message.content;
+
+      // 將助理回覆加入歷史紀錄
+      history.push({ role: "assistant", content: reply });
+
+      // 顯示助理訊息
+      const botDiv = document.createElement("div");
+      botDiv.className = "message bot";
+      botDiv.innerHTML = `stock GPT：${reply}`;
+      chatDiv.appendChild(botDiv);
+
+      // 自動捲動到底部
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>
