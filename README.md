@@ -13,6 +13,5 @@
    uvicorn main:app --reload --port 8000
    ```
 4. 用瀏覽器開啟 `index.html` 開始聊天！
-   ```bash
-5. 為此期末專案 : https://github.com/yu3249/Introducing-Generative-AI-for-Humanities- 
-   ``` 
+5. 為此課程期末專案 : https://github.com/yu3249/Introducing-Generative-AI-for-Humanities- 
+   
